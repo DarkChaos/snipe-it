@@ -92,10 +92,9 @@ do
   [ ! -d "/var/lib/snipeit/$dir" ] && mkdir -p "/var/lib/snipeit/$dir"
 done
 
-chown -R docker:root /var/lib/snipeit/data/*
-chown -R docker:root /var/lib/snipeit/dumps
-chown -R docker:root /var/lib/snipeit/keys
-chown -R docker:root /var/www/html/storage/framework/cache
+
+
+# OpenShift: Do not chown/chmod persistent volumes (handled by platform)
 
 # Fix php settings
 if [ -v "PHP_UPLOAD_LIMIT" ]
@@ -127,6 +126,7 @@ php artisan config:cache
 # we do this after the artisan commands to ensure that if the laravel
 # log got created by root, we set the permissions back
 touch /var/www/html/storage/logs/laravel.log
-chown -R docker:root /var/www/html/storage/logs/laravel.log
+chown -R 0:0 /var/www/html/storage/logs/laravel.log
+chmod -R g=u /var/www/html/storage/logs/laravel.log
 
 exec supervisord -c /supervisord.conf
